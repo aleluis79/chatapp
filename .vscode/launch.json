@@ -6,7 +6,7 @@
             "name": "🚀 React Launch",
             "request": "launch",
             "runtimeExecutable": "npm",
-            "runtimeArgs": ["run", "dev"],
+            "runtimeArgs": ["run", "dev", "--", "--host", "0.0.0.0", "--port", "5173"],
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
             "skipFiles": ["<node_internals>/**", "<node_modules>/**"],
