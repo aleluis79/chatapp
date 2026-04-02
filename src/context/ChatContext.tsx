@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from 'react'
+import { generateId } from '../utils/helpers'
 
 export interface ChatMessage {
   id: string
@@ -9,7 +10,10 @@ export interface ChatMessage {
 
 interface ChatContextType {
   messages: ChatMessage[]
-  addMessage: (message: Omit<ChatMessage, 'id' | 'timestamp'>) => void
+  // addMessage returns the id of the created message
+  addMessage: (message: Omit<ChatMessage, 'id' | 'timestamp'>) => string
+  // appendToMessage is used to stream tokens into an existing message
+  appendToMessage: (id: string, token: string) => void
   clearMessages: () => void
   isLoading: boolean
   setIsLoading: (loading: boolean) => void
@@ -21,13 +25,18 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [isLoading, setIsLoading] = useState(false)
 
-  const addMessage = (message: Omit<ChatMessage, 'id' | 'timestamp'>) => {
+  const addMessage = (message: Omit<ChatMessage, 'id' | 'timestamp'>): string => {
     const newMessage: ChatMessage = {
       ...message,
-      id: Date.now().toString(),
+      id: generateId(),
       timestamp: new Date(),
     }
     setMessages(prev => [...prev, newMessage])
+    return newMessage.id
+  }
+
+  const appendToMessage = (id: string, token: string) => {
+    setMessages(prev => prev.map(m => (m.id === id ? { ...m, content: m.content + token } : m)))
   }
 
   const clearMessages = () => {
@@ -35,7 +44,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <ChatContext.Provider value={{ messages, addMessage, clearMessages, isLoading, setIsLoading }}>
+    <ChatContext.Provider value={{ messages, addMessage, appendToMessage, clearMessages, isLoading, setIsLoading }}>
       {children}
     </ChatContext.Provider>
   )

@@ -5,7 +5,7 @@ import { useChat } from '../context/ChatContext'
 import { Send, Loader, Settings } from 'lucide-react'
 
 export function ChatContainer() {
-  const { messages, addMessage, isLoading, setIsLoading, clearMessages } = useChat()
+  const { messages, addMessage, appendToMessage, isLoading, setIsLoading, clearMessages } = useChat()
   const [input, setInput] = useState('')
   const [showSettings, setShowSettings] = useState(false)
   const [selectedModel, setSelectedModel] = useState<ModelId>('Qwen2.5-0.5B-Instruct-q4f32_1-MLC')
@@ -60,6 +60,7 @@ export function ChatContainer() {
 
     const userMessage = input.trim()
     setInput('')
+    // Add the user message
     addMessage({
       role: 'user',
       content: userMessage,
@@ -67,34 +68,33 @@ export function ChatContainer() {
 
     setIsLoading(true)
 
+    const conversationMessages: LLMMessage[] = messages.map(msg => ({
+      role: msg.role,
+      content: msg.content,
+    }))
+
+    conversationMessages.push({
+      role: 'user',
+      content: userMessage,
+    })
+
+    // Create assistant placeholder before streaming so errors can append to it
+    const assistantId = addMessage({ role: 'assistant', content: '' })
+
     try {
-      const conversationMessages: LLMMessage[] = messages.map(msg => ({
-        role: msg.role,
-        content: msg.content,
-      }))
-      
-      conversationMessages.push({
-        role: 'user',
-        content: userMessage,
+      await llmService.chat(conversationMessages, (token: string) => {
+        appendToMessage(assistantId, token)
       })
 
-      const response = await llmService.chat(conversationMessages, () => {
-        // Token callback - can be used for streaming UI updates
-      })
-
-      addMessage({
-        role: 'assistant',
-        content: response,
-      })
+      // Full response is already accumulated in the assistant message via appendToMessage
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'An error occurred'
-      addMessage({
-        role: 'assistant',
-        content: `Error: ${errorMessage}`,
-      })
+      // Append error text to the existing assistant placeholder
+      appendToMessage(assistantId, `\n\nError: ${errorMessage}`)
     } finally {
       setIsLoading(false)
-      inputRef.current?.focus()
+      // Focus input after render to ensure it's enabled and mounted
+      setTimeout(() => inputRef.current?.focus(), 0)
     }
   }
 
