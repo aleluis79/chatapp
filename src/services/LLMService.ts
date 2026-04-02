@@ -4,11 +4,13 @@ export type ModelId =
   | 'Qwen2.5-0.5B-Instruct-q4f32_1-MLC'
   | 'Phi-3-mini-4k-instruct-q4f32_1-MLC'
   | 'mistral-7b-instruct-v0p2-q4f16_1-MLC'
+  | 'Llama-3.1-8B-Instruct-q4f32_1-MLC'
 
 const MODEL_PRESETS: Record<ModelId, string> = {
   'Qwen2.5-0.5B-Instruct-q4f32_1-MLC': 'Qwen 2.5 - Muy rapido, modelo ligero',
   'Phi-3-mini-4k-instruct-q4f32_1-MLC': 'Phi-3 Mini - Rápido y competente',
   'mistral-7b-instruct-v0p2-q4f16_1-MLC': 'Mistral-7B - Más potente (requiere más recursos)',
+  'Llama-3.1-8B-Instruct-q4f32_1-MLC': 'Llama 3.1 - Modelo avanzado (requiere más recursos)',
 }
 
 export interface LLMMessage {
