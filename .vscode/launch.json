@@ -1,0 +1,40 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "name": "🚀 React Launch",
+            "request": "launch",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run", "dev"],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "skipFiles": ["<node_internals>/**", "<node_modules>/**"],
+            "serverReadyAction": {
+                "pattern": "Local:\\s+(https?://\\S+)",
+                "uriFormat": "%s",
+                "killOnServerStop": true,
+                "action": "debugWithChrome",
+                //"action": "startDebugging",
+                //"name": "🌐 Launch Integrated Browser",
+            },
+            "presentation": {
+                "hidden": false,
+                "group": "frontend",
+                "order": 1
+            },
+        },        
+        {
+            "name": "🌐 Launch Integrated Browser",
+            "request": "launch",
+            "type": "editor-browser",
+            "url": "http://localhost:5173",
+            "webRoot": "${workspaceFolder}",
+            "presentation": {
+                "hidden": true,
+                "group": "frontend",
+                "order": 1
+            }            
+        }
+    ]
+}
