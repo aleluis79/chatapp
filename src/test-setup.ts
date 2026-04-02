@@ -11,6 +11,10 @@ if (!(globalThis as any).__mlcMockControl__) {
 
 // Mock @mlc-ai/web-llm for Node test environment with controllable streaming behavior
 vi.mock('@mlc-ai/web-llm', () => {
+  const prebuiltAppConfig = {
+    model_list: [],
+  }
+
   class MLCEngine {
     ready: Promise<void>
     chat: any
@@ -43,8 +47,20 @@ vi.mock('@mlc-ai/web-llm', () => {
     async terminate() {
       return
     }
+    async unload() {
+      return
+    }
   }
-  return { MLCEngine }
+
+  const CreateMLCEngine = async (_modelId: string) => {
+    return new MLCEngine()
+  }
+
+  const deleteModelAllInfoInCache = async (_modelId: string) => {
+    return
+  }
+
+  return { MLCEngine, CreateMLCEngine, deleteModelAllInfoInCache, prebuiltAppConfig }
 })
 
 // Silence expected console.error messages during tests that are caused by mocked LLM errors
